@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get DB URL from .env file
-MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017") 
+MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://admin:1qaz!QAZ1qaz@travelapp.dgyto1m.mongodb.net/?appName=TravelApp") 
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
 db = client.travel_app  # The DB name is 'travel_app'
