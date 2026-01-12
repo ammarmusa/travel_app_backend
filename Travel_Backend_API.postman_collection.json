@@ -1,0 +1,432 @@
+{
+  "info": {
+    "_postman_id": "travel-backend-api",
+    "name": "Travel Backend API",
+    "description": "API collection for Travel Backend application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:4448",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "wishlist_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "activity_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user. Default role is 'user'. Maximum 3 users allowed."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Get Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "itsammarmusa@gmail.com",
+                  "description": "Email address",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "1qaz!QAZ",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/token",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "token"]
+            },
+            "description": "Login with email and password to get JWT access token. Token is automatically saved to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get the current authenticated user's profile."
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints for user registration, login, and profile."
+    },
+    {
+      "name": "Wishlist",
+      "item": [
+        {
+          "name": "Create Wishlist (Manual Coordinates)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('wishlist_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Eiffel Tower\",\n  \"description\": \"Must visit at sunset!\",\n  \"status\": \"Wishlist\",\n  \"latitude\": 48.8584,\n  \"longitude\": 2.2945\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wishlist/",
+              "host": ["{{base_url}}"],
+              "path": ["wishlist", ""]
+            },
+            "description": "Create a new wishlist place with manual coordinates. Status options: Wishlist, Planned, Visited."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Wishlist (Google Maps URL)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('wishlist_id', jsonData.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Desaru Beach\",\n  \"description\": \"Beautiful beach in Johor!\",\n  \"status\": \"Wishlist\",\n  \"google_maps_url\": \"https://maps.app.goo.gl/aW6JrFcncKn1C9tn8\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wishlist/",
+              "host": ["{{base_url}}"],
+              "path": ["wishlist", ""]
+            },
+            "description": "Create a new wishlist place using Google Maps URL. Coordinates are automatically extracted from the URL."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Wishlists",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wishlist/",
+              "host": ["{{base_url}}"],
+              "path": ["wishlist", ""]
+            },
+            "description": "Get all wishlist places for the current user."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Wishlist by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wishlist/{{wishlist_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["wishlist", "{{wishlist_id}}"]
+            },
+            "description": "Get a specific wishlist place by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Wishlist",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Place Name\",\n  \"description\": \"Updated description\",\n  \"status\": \"Planned\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wishlist/{{wishlist_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["wishlist", "{{wishlist_id}}"]
+            },
+            "description": "Update a wishlist place. All fields are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Wishlist",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wishlist/{{wishlist_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["wishlist", "{{wishlist_id}}"]
+            },
+            "description": "Delete a wishlist place."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Activity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.activities && jsonData.activities.length > 0) {",
+                  "    var lastActivity = jsonData.activities[jsonData.activities.length - 1];",
+                  "    pm.collectionVariables.set('activity_id', lastActivity.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Buy entrance ticket\",\n  \"cost\": 50.00,\n  \"is_completed\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wishlist/{{wishlist_id}}/activities",
+              "host": ["{{base_url}}"],
+              "path": ["wishlist", "{{wishlist_id}}", "activities"]
+            },
+            "description": "Add a new activity to a wishlist place."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Activity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated activity name\",\n  \"cost\": 75.00,\n  \"is_completed\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/wishlist/{{wishlist_id}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": [
+                "wishlist",
+                "{{wishlist_id}}",
+                "activities",
+                "{{activity_id}}"
+              ]
+            },
+            "description": "Update an activity in a wishlist place. All fields are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Activity",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/wishlist/{{wishlist_id}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": [
+                "wishlist",
+                "{{wishlist_id}}",
+                "activities",
+                "{{activity_id}}"
+              ]
+            },
+            "description": "Delete an activity from a wishlist place."
+          },
+          "response": []
+        }
+      ],
+      "description": "Wishlist endpoints for managing travel places and activities."
+    },
+    {
+      "name": "Places (Legacy)",
+      "item": [
+        {
+          "name": "Create Place",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sample Place\",\n  \"description\": \"A nice place to visit\",\n  \"google_maps_url\": \"https://maps.google.com/...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/places/",
+              "host": ["{{base_url}}"],
+              "path": ["places", ""]
+            },
+            "description": "Create a new place (legacy endpoint)."
+          },
+          "response": []
+        }
+      ],
+      "description": "Legacy places endpoint."
+    }
+  ]
+}
